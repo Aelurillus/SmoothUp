@@ -44,10 +44,11 @@ impl Drop for TempDir {
 
 #[test]
 fn executable_paths_with_shell_characters_are_literal() {
-    let root = TempDir(std::env::temp_dir().join(format!("smoothup-literal-{}", std::process::id())));
+    let executable = std::env::current_exe().unwrap();
+    let root = TempDir(executable.parent().unwrap().join(format!("smoothup-literal-{}", std::process::id())));
     std::fs::create_dir(&root.0).unwrap();
     let path = root.0.join("路径 空格 & ' [x] ;.exe");
-    std::fs::hard_link(std::env::current_exe().unwrap(), &path).unwrap();
+    std::fs::hard_link(&executable, &path).unwrap();
     let cancel = Arc::new(AtomicBool::new(false));
     let output = process::capture(&path, &fixture_args("fixture_literal"), &cancel, 4096).unwrap();
     assert!(String::from_utf8(output).unwrap().contains("literal-path-executed"));
