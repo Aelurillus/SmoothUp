@@ -1,0 +1,7 @@
+/target/
+/.tools/
+/dist/
+/.work/
+/.omp/lsp.json
+*.partial
+*.tmp
