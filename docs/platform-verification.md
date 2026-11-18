@@ -300,6 +300,36 @@ C、D 的流来自各自正式播放页当前选中的 `video.currentSrc`，使�
 
 原始记录与媒体位于忽略目录，不随源码分发；记录不含 Cookie、访问令牌或带签名 CDN URL。B、C、D 最终均已确认仅自己可见，作品链接需要投稿账号访问。手机 App、物理屏幕唯一帧数、音画同步和真实运动长素材仍未测量。
 
+### 8.5 抖音直式与 HEVC 对照（2026-11-18）
+
+继续以第 8.4 节的原生合成样片 B 为源，新增两个独立方向的对照：F 将画面顺时针旋转为 1080×1920，继续使用 H.264；G 保持 1920×1080，改用 HEVC/hvc1。两者都保持正常速度，没有修改时间戳比例。本轮不是实际运动素材测试，也不能据此判断所有内容的分发行为。
+
+| 本地输入（均在 `.work/probe/`） | 完整解码结果 | SHA256 |
+| --- | --- | --- |
+| `douyin-F-portrait1080p60.mp4` | H.264/AAC；1080×1920；60fps；12 秒、720 帧 | `82910202aae6b59a6a466fadd4da470f79899c825c73cbb22c999f91b3973397` |
+| `douyin-G-hevc1080p60.mp4` | HEVC/AAC；1920×1080；60fps；12 秒、720 帧 | `aa9a714bcdca7b925b3ba29a3ac07727ed49114998a1ab5e178ded68794df6c1` |
+
+F 使用 `transpose=clock`、libx264 fast、12Mbps 目标码率、16Mbps 上限、24Mbps 缓冲；G 使用 libx265 fast、CRF 18、`hvc1` 标签。两者均为 yuv420p、BT.709、120 帧 GOP、AAC 流复制与 `+faststart`，完整生成参数保存在下述脱敏记录中。
+
+两份作品均在提交前选择“仅自己可见”，提交后刷新管理页，确认 `private_status=1`、`self_see=true`、`in_reviewing=false`，再打开正式作品页取回当前分发流。
+
+| 正式作品 | 正式分发流完整解码 | 浏览器 1 倍速实测 |
+| --- | --- | --- |
+| [直式对照 F，7709354197333937418](https://www.douyin.com/user/self?modal_id=7709354197333937418) | H.264/AAC；720×1280；30fps；12.033333 秒、361 帧 | 66 帧 / 2.215892 秒 = **29.78fps**；掉帧 0；流未切换 |
+| [HEVC 对照 G，7709354659839855907](https://www.douyin.com/user/self?modal_id=7709354659839855907) | H.264/AAC；1280×720；30fps；12.033333 秒、361 帧 | 66 帧 / 2.216762 秒 = **29.77fps**；掉帧 0；流未切换 |
+
+两份正式播放页本次都只返回一个 `normal_720_0`、30fps 档位。通过现有浏览器会话取回对应 `video.currentSrc`，再用 `ffprobe -count_frames` 完整解码，退出码均为 0、无错误输出；AAC 音轨时长均为 12.010680 秒。浏览器计数使用 `getVideoPlaybackQuality()` 帧数差除以媒体时间差，不代表物理屏幕唯一帧数或音画同步已通过。
+
+结论：**直式画幅与 HEVC 编码在这两份测试中均未保留全高清 60fps。**结合此前对照，当前仍未取得该账号网页投稿的正常速度 1080p60 路径；不把这次结果外推为抖音整体不支持，也不修改 SmoothUp 现有编码预设。手机 App、物理显示、音画同步与真实运动长素材仍未测量。
+
+脱敏记录：`.work/probe/douyin-format-controls-20261118.json`；SHA256 `d1afe97fd71423c103d4565709e8cadcb347d1d681dd17e04ce8f86ccd81a2f0`。正式分发文件：
+
+- `.work/probe/douyin-F-portrait-distributed.mp4`；SHA256 `6ef38ecf7fa4c652b40505e6fad0722d32cf2194b0cae7685eb2a013646de229`。
+- `.work/probe/douyin-G-hevc-distributed.mp4`；SHA256 `01236a12f54f1320a7d7652180c00f07df759ef8c3df41d34c1d4b583ccb4595`。
+- 正式播放页截图 `.work/probe/douyin-G-formal-playback.png`；SHA256 `ed56540f4a420033aaa9beff2b8aeee2cb3e60265b46d499cb275c4d135fec20`；仅证明页面与内容，不作为帧率证据。
+
+原始记录与媒体位于忽略目录，不随源码分发；脱敏记录不含 Cookie、访问令牌或带签名 CDN URL。两份作品保持私密，需要投稿账号访问。
+
 ## 9. 判定清单
 
 - [ ] 本地 `verify` 通过，且 `ffprobe` 帧率/时长/音频符合预期。
