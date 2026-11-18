@@ -408,6 +408,44 @@ ffmpeg -i .\output.4k120.mp4 -vf fps=60 -c:v libx264 -preset fast -crf 17 -pix_f
 - `4k120-method-audit.json`：上游方法审计与未执行假设；SHA256 `ca6e966955328f707dae6e6735af536369188cfa24cf5b97ac95fab27b208eaa`。
 - `bilibili-M-rife4k120-formal.png`：正式播放页，仅作画面证据；SHA256 `b74e579ca14633a01bc781020ac1201552c63bd2c0c779e3973101701169bca1`。
 
+### 8.7 抖音 HEVC 4K120、有效双音轨与原片路由复查（2026-11-18）
+
+继续使用第 8.6 节已验证的真实运动 RIFE 成品 M，新增 HEVC 对照 O 与有效双音轨对照 P。二者均保留原来的 8 秒、960 帧画面，没有通过慢放改变速度。投稿后已在管理页确认 `private_status=1`、`in_reviewing=false`，作品仅自己可见。
+
+| 对照 / 本地文件（位于 `.work/probe/`） | 完整解码结果 | SHA256 |
+| --- | --- | --- |
+| O：`douyin-O-4k120-hevc-stereo.mp4` | HEVC/hvc1、3840×2160、120fps；8 秒、960 帧；AAC 48kHz 双声道，8 秒 | `a3ad908dcfc3e0515d8c4546bac0d2650f6c8ad2002a47dc2fc006e4a25906a6` |
+| P：`douyin-P-4k120-valid-dualaudio.mp4` | H.264 视频流复制，3840×2160、120fps；画面 8 秒、960 帧；两条有效 AAC 48kHz 双声道音轨，均为 8.04 秒；容器 8.04 秒 | `79b126dad73a5497b088c0c76579578e4c67e83b72def5cd9894a2afeef7bb0e` |
+
+P 的生成命令如下。它只在音轨尾端补 40 毫秒静音并复制一条有效音轨，不伪造音频样本。此参数是独立对照，**不是已验证成功的抖音推荐封装**，也不能称为对私有软件算法的复现：
+
+```powershell
+ffmpeg -nostdin -v error -n -i .\smoothup-4k120-rife.mp4 -map 0:v:0 -map 0:a:0 -map 0:a:0 -c:v copy -c:a aac -b:a 192k -ar 48000 -ac 2 -af apad=pad_dur=0.04 -t 8.04 -disposition:a:0 default -disposition:a:1 0 -movflags +faststart .\douyin-P-4k120-valid-dualaudio.mp4
+```
+
+| 正式作品 | 所选正式分发流完整解码 | 观察时间（UTC） |
+| --- | --- | --- |
+| [HEVC 对照 O，7709410326541864227](https://www.douyin.com/user/self?modal_id=7709410326541864227) | H.264、1280×720、30fps；视频 8.033333 秒、241 帧；AAC 音轨 8 秒 | 07:31:46；07:48:57 再读档位仍最高 720p30 |
+| [双音轨对照 P，7709416319677959474](https://www.douyin.com/user/self?modal_id=7709416319677959474) | H.264、1280×720、30fps；视频 8.033333 秒、241 帧；平台只保留一条 AAC 44.1kHz 双声道音轨，8.042653 秒 | 07:55:07；作品于 07:52:49 创建 |
+
+两份正式流完整解码退出码均为 0。P 的浏览器 1 倍速窗口为 149 帧 / 4.959742 媒体秒 = **30.04fps**，墙钟 5.0036 秒、掉帧 0、流未切换；这不证明物理屏幕唯一帧数或音画同步。M / N 于 UTC 07:46:35 / 07:48:49 复查时，返回档位也仍最高 720p30。
+
+另以 O 的平台已签发 `playApi` 请求 `ratio=default`，返回 HTTP 200、1,798,150 字节；文件 SHA256 与 O 所选正式流完全相同。该次 `default` 路由没有返回更高画质，不据此推断所有原片访问路径或其他账号的结果。
+
+本地填充样本实验向视频样本表追加 H.264 filler NAL，并使用原有编辑列表限制呈现区间。原视频与音频样本字节核对一致，但唯一一次完整 FFmpeg 解码退出码为 **69**，出现 `missing picture in access unit` 与无效数据错误；即使数到 960 帧、8 秒也不通过。该文件未上传，未继续进行第二解码器播放，不加入产品预设。
+
+新增上游线索的边界：[Hundred Twenty](https://github.com/messor1053/hundredtwenty/blob/1669df1363e4f72e54294125163e6f09b9e1da29/CHANGELOG.md) 的记录指向一次 TikTok 1080p120 测试，4K 未测且没有可复现的封装参数；[FrameTrace](https://github.com/coookie23/fhr_fake/blob/cd13e24e0640e914516cb17ea07632204130104d/PROJECT_MEMO.md) 仍属时间缩放方法。这些资料没有提供本轮可完整解码核验的抖音正常速度 4K120 正式流。
+
+**本轮尚未取得抖音 4K120 正式分发。**上述观察仍处于各作品首次发布后的两小时内；官方写的是高清转码“一般”在两小时内完成，并非完成保证。本轮计划于 **2026-11-18 09:56 UTC（北京时间 17:56）以后**重新读取 M / N / O / P 的实际档位，必要时取回新的正式流解码；目前不把这些中期结果写成最终转码结论。两平台正常速度 4K120 目标仍未完成，编码预设保持不变。
+
+原始媒体与脱敏记录均位于忽略目录 `.work/probe/`，不随源码或发布包分发，不含 Cookie、访问令牌或带签名 CDN URL：
+
+- `douyin-uhd120-followup-20261118.json`：本节生成参数、发布回执、完整解码、浏览器计数与中期档位；SHA256 `ad10e1e446a312ab5197a87adb9bd79157ec33c7b2e2daabb3aa7a44949f60c0`。
+- `douyin-O-hevc4k120-distributed.mp4` 与 `douyin-O-signed-default.bin`：相同字节；SHA256 均为 `b044eeea5a9c74cffaee9b0cd4802d46b7b23fddcca452525fab36d74ee697af`。
+- `douyin-P-dualaudio-distributed.mp4`：SHA256 `a1df366389168c4c831faf0d550f297263b30f18a43a98c921bfc200014087dc`。
+- `filler-local-proof.json`：拒绝原因与样本字节核对；SHA256 `6d271a4bd55d7e14e25a7a5968b66cd4a26ebba17fc16d25428782ce53148167`。
+- `native120-path-audit-20261118.json`：新增线索的固定版本、授权边界与证据限制；SHA256 `9f029d36f7706d06b4bd57d0fa67bb1f2a360525351ac19bd65bbaef0440706f`。
+
 ## 9. 判定清单
 
 - [ ] 本地 `verify` 通过，且 `ffprobe` 帧率/时长/音频符合预期。
