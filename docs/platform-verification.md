@@ -434,6 +434,10 @@ ffmpeg -nostdin -v error -n -i .\smoothup-4k120-rife.mp4 -map 0:v:0 -map 0:a:0 -
 
 另以 O 的平台已签发 `playApi` 请求 `ratio=default`，返回 HTTP 200、1,798,150 字节；文件 SHA256 与 O 所选正式流完全相同。该次 `default` 路由没有返回更高画质，不据此推断所有原片访问路径或其他账号的结果。
 
+为分离私密投稿与公开审核因素，成品 M 于 UTC 08:24 临时改为公开。刷新管理页后先显示“审核中”，至 UTC 08:27:45 显示“已发布”、`private_status=0`、`is_private=false`、`status_value=102`。随后刷新正式作品页，新出现一个 HEVC 档位，但取回的 H.264 所选流与 HEVC 流均完整解码为 **1280×720、30fps、8.033333 秒、241 帧**，AAC 音轨均为 8 秒，解码退出码均为 0。浏览器 1 倍速窗口为 149 帧 / 4.961598 媒体秒 = **30.03fps**，墙钟 5.0045 秒、掉帧 0、流未切换。UTC 08:29:45 再次刷新管理页，确认 M 已恢复 `private_status=1`、`is_private=true`。这次公开审核没有产生 4K120；作品仍未满两小时，不能据此判定最终高清档位。
+
+P 的另一项原片路由检查保留已签发请求的其他参数，删除 `file_id` 并添加 `ratio=default`，返回 HTTP 404、空响应，没有取得原片；不能把这个签名请求变体视为所有原片入口的结论。
+
 本地填充样本实验向视频样本表追加 H.264 filler NAL，并使用原有编辑列表限制呈现区间。原视频与音频样本字节核对一致，但唯一一次完整 FFmpeg 解码退出码为 **69**，出现 `missing picture in access unit` 与无效数据错误；即使数到 960 帧、8 秒也不通过。该文件未上传，未继续进行第二解码器播放，不加入产品预设。
 
 新增上游线索的边界：[Hundred Twenty](https://github.com/messor1053/hundredtwenty/blob/1669df1363e4f72e54294125163e6f09b9e1da29/CHANGELOG.md) 的记录指向一次 TikTok 1080p120 测试，4K 未测且没有可复现的封装参数；[FrameTrace](https://github.com/coookie23/fhr_fake/blob/cd13e24e0640e914516cb17ea07632204130104d/PROJECT_MEMO.md) 仍属时间缩放方法。这些资料没有提供本轮可完整解码核验的抖音正常速度 4K120 正式流。
@@ -448,6 +452,9 @@ ffmpeg -nostdin -v error -n -i .\smoothup-4k120-rife.mp4 -map 0:v:0 -map 0:a:0 -
 - `filler-local-proof.json`：拒绝原因与样本字节核对；SHA256 `6d271a4bd55d7e14e25a7a5968b66cd4a26ebba17fc16d25428782ce53148167`。
 - `native120-path-audit-20261118.json`：新增线索的固定版本、授权边界与证据限制；SHA256 `9f029d36f7706d06b4bd57d0fa67bb1f2a360525351ac19bd65bbaef0440706f`。
 - `douyin-P-packet-geometry-audit-20261118.json`：封包逐项核对、精确有理时间比较与原片/分发尺寸区别；SHA256 `616610e9a70c8b2af2fe36e15dc1c17ec304057715848242bcbb0f019a7d9a0c`。
+- `douyin-M-public-review-20261118.json`：公开审核完成、H.264/HEVC 完整解码、浏览器计数与恢复私密回执；SHA256 `caece5dad6e39d66e45f0b10f351138bbe839862f0977778867aeedd7de29ba4`。
+- `douyin-M-public-selected-20261118.mp4`：公开阶段所选 H.264 正式流；SHA256 `4692f6a11861c62e91aac163463007f9ab2fbc635c0bfb87a380acb65004f161`。
+- `douyin-M-public-hevc-20261118.mp4`：公开阶段新增 HEVC 正式流；SHA256 `ab204ddc32e5a23ee60be05089ab2130883a6f1c55414a2b8eb9c338dc176a1e`。
 
 ## 9. 判定清单
 
