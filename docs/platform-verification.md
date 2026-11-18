@@ -430,6 +430,8 @@ ffmpeg -nostdin -v error -n -i .\smoothup-4k120-rife.mp4 -map 0:v:0 -map 0:a:0 -
 
 两份正式流完整解码退出码均为 0。P 的浏览器 1 倍速窗口为 149 帧 / 4.959742 媒体秒 = **30.04fps**，墙钟 5.0036 秒、掉帧 0、流未切换；这不证明物理屏幕唯一帧数或音画同步。M / N 于 UTC 07:46:35 / 07:48:49 复查时，返回档位也仍最高 720p30。
 
+另逐个核对 P 与原成品的 960 个视频封包：载荷 SHA256、大小及按各自 `time_base` 换算的 PTS、DTS、持续时间全部相同。重封装将时间基准由 `1/120` 改为 `1/15360`，原始 tick 数不能直接比较。UTC 08:05:46 的 P 页面模型仍保留原片 3840×2160 标记，但实际所选流为 1280×720、30fps，没有 HEVC 备用地址或附加视频模型；原片尺寸字段不能替代分发流验收。
+
 另以 O 的平台已签发 `playApi` 请求 `ratio=default`，返回 HTTP 200、1,798,150 字节；文件 SHA256 与 O 所选正式流完全相同。该次 `default` 路由没有返回更高画质，不据此推断所有原片访问路径或其他账号的结果。
 
 本地填充样本实验向视频样本表追加 H.264 filler NAL，并使用原有编辑列表限制呈现区间。原视频与音频样本字节核对一致，但唯一一次完整 FFmpeg 解码退出码为 **69**，出现 `missing picture in access unit` 与无效数据错误；即使数到 960 帧、8 秒也不通过。该文件未上传，未继续进行第二解码器播放，不加入产品预设。
@@ -445,6 +447,7 @@ ffmpeg -nostdin -v error -n -i .\smoothup-4k120-rife.mp4 -map 0:v:0 -map 0:a:0 -
 - `douyin-P-dualaudio-distributed.mp4`：SHA256 `a1df366389168c4c831faf0d550f297263b30f18a43a98c921bfc200014087dc`。
 - `filler-local-proof.json`：拒绝原因与样本字节核对；SHA256 `6d271a4bd55d7e14e25a7a5968b66cd4a26ebba17fc16d25428782ce53148167`。
 - `native120-path-audit-20261118.json`：新增线索的固定版本、授权边界与证据限制；SHA256 `9f029d36f7706d06b4bd57d0fa67bb1f2a360525351ac19bd65bbaef0440706f`。
+- `douyin-P-packet-geometry-audit-20261118.json`：封包逐项核对、精确有理时间比较与原片/分发尺寸区别；SHA256 `616610e9a70c8b2af2fe36e15dc1c17ec304057715848242bcbb0f019a7d9a0c`。
 
 ## 9. 判定清单
 
