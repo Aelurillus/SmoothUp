@@ -11,7 +11,7 @@
 | **发布/转码分发** | 提交发布（可仅自己可见）成功，出现稿件 URL/审核状态，平台完成转码与分发。 | “上传完成”、草稿保存、开放 API 返回 `video_id` 但未发布。 |
 | **实际显示** | 在指定设备、客户端版本、显示刷新率下，用慢动作录像/逐帧检查测得目标帧率，并检查音画同步。 | 平台清晰度标签（如“1080P60”）、主观“看起来更流畅”、上传或发布成功本身。 |
 
-当前已完成原生 1080p30 输入经 SmoothUp RIFE 补帧为 60/120fps 的两平台仅自己可见投稿与网页测量：B 站两份成品在“1080P 60帧”档均分发为 1080p60；抖音两份当前网页流均为 720p30。两平台此次均未测到 120fps 保留，完整解码、浏览器计数和限制见第 8.3 节；此前低清成品与原生高帧率基线记录保留在第 8.1 节。手机 App、物理屏幕显示和音画同步仍未测量。
+当前已完成原生 4K30 动态片段经 SmoothUp RIFE 补帧为 4K120 的两平台私密投稿：B 站所选 4K 正式流完整解码为 8 秒、960 帧，浏览器 1 倍速计数约 120.59fps，测量窗口掉帧 4；抖音同片与 4K60 对照当前均为 720p30，观察仍处于官方所述高清转码窗口内。完整证据、复现命令和限制见第 8.6 节。此前 1080p 与低清记录分别保留在第 8.3 节和第 8.1 节；手机 App、物理屏幕唯一帧数和音画同步仍未测量。
 
 ## 2. 官方资料核对（截至 2026-11-18）
 
@@ -23,6 +23,7 @@
 - 网页创作者中心与开放 API 是不同入口，限制与审核流程可能不同；不要用 API 文档推断网页上传的播放行为。
 - 2026-11-18 用真实 Chrome 打开 <https://creator.douyin.com/creator-micro/content/upload>：页面 body 为空白；React / React-dom / SystemJS 等来自 `unpkg.byted-static.com` 的脚本报 `net::ERR_CONNECTION_CLOSED`，`DouyinCreatorBrowserCheck` 为 `undefined`。这是脚本/网络加载受阻，**不能归因为未登录**；本次未取得可用的页面规格或上传证据，也不能据此推断抖音的限制或播放能力。
 - 2026-11-18 再次使用同一真实 Chrome 会话，上传页已正常加载。上传 SmoothUp 实际 30→60fps 成品后页面明确显示“上传成功”；点击“暂存离开”，返回上传页出现“你还有上次未发布的视频，是否继续编辑？”，继续编辑后标题与视频均恢复。此前脚本加载失败不再是当前上传阻碍；这次只验证文件接收与暂存恢复，未点击“发布”。
+- 同日实际打开创作者中心的[视频上传说明](https://creator.douyin.com/creator-micro/content/quality_statement?enter_method=click)：页面区分“可上传任意分辨率和帧率”与“播放最高 4K、60 帧”。表内 4K/2K 为最高 60fps，1080p/720p/540p 为最高 30fps；不把上传接收能力当成 120fps 播放承诺。页面说明先发布低画质版本，高清转码一般在两小时内完成，并建议定时发布以预留处理时间；这不是处理完成时限保证。脱敏页面文字与截图见第 8.6 节。
 - 抖音是平台商标；本项目不提供登录、上传或绕过审核的功能。
 
 ### 哔哩哔哩
@@ -33,6 +34,7 @@
   - 60fps 清晰度最初只对参加内测的 UP 主新上传稿件生效；这是历史状态，不等于当前政策。
 - 平台可能按分辨率、码率、账号权益、客户端与网络选择转码档位；高帧率源不保证原样播放。
 - 2026-11-18 的浏览器 relay 实际打开了已登录的投稿页 <https://member.bilibili.com/platform/upload/video/frame>：页面可选择文件，并显示 16G/10h、推荐 MP4/MOV/MKV、1080p/4K。这是**页面 UI 观察**，不是发布/转码分发或实际显示证据，且可能随账号与版本变化。
+- 同日继续核对当前投稿页：4K 及以下输入最高支持 120fps，推荐 4K 视频码率大于 20000kbps；当前播放器的 4K 档标为“4K 超高清”，没有单独的 120 帧开关。该账号具备大会员播放权益。真正的 120fps 分发证据来自第 8.6 节自己的私密稿件与完整解码，而非活动标题或投稿参数。
 
 ### 结论
 
@@ -94,6 +96,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\generate-samples.ps1 -Seconds
 1. 使用网页创作者中心或抖音 App 的常规发布入口，上传本地验证过的样片。
 2. 标题/封面随意但合规；如平台提供“仅自己可见/私密”选项，优先使用，避免公开测试内容。
 3. 等待平台处理完成，记录作品链接、发布时间、账号类型与 App/网页版本。
+   - 记录首次发布与复查的实际时间。官方说明高清版本一般在两小时内完成；刚发布只见低清档时，应稍后在正式播放页复查，不要把首次 720p30 直接判成最终结果。
 4. 记录平台是否提示格式、分辨率、时长或审核问题；不要用“上传进度 100%”当作发布成功。
 
 ### 哔哩哔哩
@@ -102,6 +105,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\generate-samples.ps1 -Seconds
 2. 选择与实际相符的投稿类型（自制/转载）；测试样片应标为自制或按平台规则处理。
 3. 如可用，设置为自己可见/仅自己可见，等待转码完成。
 4. 记录 BV 号/链接、投稿时间、账号权益、客户端版本与平台显示的清晰度档位。
+5. 4K120 成品需要选择“4K 超高清”档并检查实际流；“1080P 60帧”档不能用于 120fps 验收。若极速发布先给出低清档，等待高清转码后再测；该账号设置页说明高清档会在完成后自动新增。
 
 上传入口完成或草稿保存只得到文件接收证据；发布/转码分发与实际显示仍需后续验证。
 
@@ -329,6 +333,80 @@ F 使用 `transpose=clock`、libx264 fast、12Mbps 目标码率、16Mbps 上限�
 - 正式播放页截图 `.work/probe/douyin-G-formal-playback.png`；SHA256 `ed56540f4a420033aaa9beff2b8aeee2cb3e60265b46d499cb275c4d135fec20`；仅证明页面与内容，不作为帧率证据。
 
 原始记录与媒体位于忽略目录，不随源码分发；脱敏记录不含 Cookie、访问令牌或带签名 CDN URL。两份作品保持私密，需要投稿账号访问。
+
+### 8.6 原生 4K 动态补帧、B 站 120fps 正式分发与抖音对照（2026-11-18）
+
+本轮使用 Big Buck Bunny 动态片段，署名为 **© 2008 Blender Foundation，www.bigbuckbunny.org，CC BY 3.0**；两平台作品说明均标明裁取、补帧与私密测试。输入本身为原生 3840×2160，不使用 1080p 放大替代 4K 验收。RIFE 转换进程实耗 1983.84 秒，约 33 分钟；这是此次机器与设置的记录，不是速度承诺。
+
+#### 本地成品
+
+下表路径均位于 `.work/probe/`。视频与音频已完整解码，退出码为 0；RIFE 报告为 `verification.valid=true`，没有错误或警告。
+
+| 文件 | 视频 / 时间轴 | SHA256 |
+| --- | --- | --- |
+| `bbb-native4k30-excerpt.mp4` | 原生 3840×2160、30fps、8 秒、240 帧 | `64978d9e167f1812e6ddbfb23816b39c8bd5cb20b49c5438ff4916a0410e4a34` |
+| `smoothup-4k120-rife.mp4` | RIFE v4.6 30→120fps；3840×2160、8 秒、960 帧；H.264/AAC，音轨同为 8 秒 | `ae197d33a8919c4951433983ef15f90fdb6f9b7df9ac7a0a047aef16c61c79a6` |
+| `smoothup-4k60-rife-derived.mp4` | 上述 RIFE 成品经 `fps=60` 重采样；3840×2160、8 秒、480 帧；音频流复制 | `0b4fe34e940a74e564da458a4984b93452b9e4b35460378fd183d2bff0195e13` |
+
+对 RIFE 本地成品和下述 B 站正式视频流分别缩小到 320×180 后计算逐帧像素 MD5：各有 960 个不同的画面散列，相邻重复数均为 0。这支持本片没有靠简单复制帧凑数；不能据此证明运动估计质量、所有场景无伪影或物理屏幕显示了全部帧。
+
+#### 私密投稿后的正式流
+
+浏览器为 Windows x64、Microsoft Edge / Chromium 157.0.0.0。测量时目标页位于前台，播放速度为 1，计数取 `getVideoPlaybackQuality()` 差值；窗口内流未切换。所有作品均设置为仅自己可见，需要投稿账号访问。
+
+| 作品 / 输入 | 所选正式分发流完整解码 | 浏览器计数 |
+| --- | --- | --- |
+| [B 站成品 M，BV1dKsU6fEee](https://www.bilibili.com/video/BV1dKsU6fEee/)；RIFE 4K120 | quality 120，“4K 超高清”；H.264、3840×2160、120/1、8 秒、960 帧 | 605 帧 / 5.016838 媒体秒 = **120.59fps**；墙钟 5.0164 秒；掉帧 4 |
+| [抖音成品 M，7709403323224362267](https://www.douyin.com/user/self?modal_id=7709403323224362267)；同一 RIFE 4K120 | 当前仅返回 `normal_720_0`；H.264、1280×720、30/1、8.033333 秒、241 帧 | 153 帧 / 5.085452 媒体秒 = **30.09fps**；墙钟 5.1171 秒；掉帧 0 |
+| [抖音对照 N，7709406277155163433](https://www.douyin.com/user/self?modal_id=7709406277155163433)；派生 4K60 | 当前仅返回 `normal_720_0`；H.264、1280×720、30/1、8.033333 秒、241 帧 | 本轮未单独量测 |
+
+B 站正式 DASH 视频与音频分开取得。视频文件 SHA256 为 `34f547925d936f22fb423f615af56187b90d255123e523c2fac09b320fd4b8a8`；独立 30280 AAC 音轨为 48kHz、双声道、起点 0、时长 8 秒、375 个解码音频帧，完整解码退出码 0，SHA256 为 `c8bd35eeb13a0115311f7068cc8730a7ad48fd7987d75d06a7fedd06e3e00c89`。音轨时长吻合不代表音画同步已经实测。
+
+抖音 M / N 完整分发文件 SHA256 分别为 `80b6832133fd9ec83f0ae37ad9e3aedc28fdeb459e17a48cc303f6340971afbc`、`54d7e7ab7289850d6a3ae152166149acf4a3a0038495405728cd1a38cd7dfc52`；两者 AAC 音轨时长均为 8 秒。页面档位于 UTC 07:03:22（M）、07:15:08（N）读取，M 的浏览器计数于 UTC 07:10:42 完成；均仍在首次发布后两小时内，**不能据此判定最终高清转码结果**。本次没有取得抖音 4K60 或 120fps 正式分发。
+
+另有独立原生合成幀号对照 L：本地为 4K120、6 秒、720 帧。其 [B 站 BV1GLsU69Ejb](https://www.bilibili.com/video/BV1GLsU69Ejb/) 正式 4K 流保持全部帧，浏览器约 120.84fps、掉帧 0；[抖音 7709400086018559272](https://www.douyin.com/user/self?modal_id=7709400086018559272) 当时为 720p30、6.033333 秒、181 帧。原生对照只用于分离平台与补帧因素，不能替代成品 M 的验收。
+
+**结论范围：本地原生 4K30→120fps 补帧与 B 站该私密稿件的正常速度 4K120 正式分发已通过。**浏览器计数有短窗口偏差且成品 M 出现掉帧，不宣称零掉帧或物理屏幕唯一帧率；样片仅 8 秒，手机 App、长视频、广泛场景、插帧伪影与音画同步仍未测量。抖音 120fps 不在所观察的官方播放规格内，当前也无保留证据，不提供成功保证。
+
+#### 复现用法
+
+先按 README 安装 FFmpeg 与可选 RIFE，准备有权使用的**原生 4K**输入；转换保持输入分辨率，不自动升到 4K。B 站用法：
+
+```powershell
+.\smoothup.exe .\native4k30.mp4 --platform bilibili --fps 120 --engine rife --quality high --output .\output.4k120.mp4 --report .\output.4k120.json
+.\smoothup.exe verify .\output.4k120.mp4 --fps 120 --json
+Get-FileHash -Algorithm SHA256 .\output.4k120.mp4
+ffprobe -v error -count_frames -show_entries stream=codec_type,codec_name,width,height,avg_frame_rate,duration,nb_read_frames -of json .\output.4k120.mp4
+```
+
+本轮实际调用的 `--platform` 为 `douyin`，其报告已保留；当前该选项只影响输出命名与平台标识，不会调用平台上传或改变帧率验收。成品 M 是同一个文件上传两平台。上述命令是现有 CLI 的正常路径，**不包含**时间尺度伪装、虚构视频样本或损坏音频。
+
+在 B 站投稿后等待 4K 转码，选择“4K 超高清”，再对实际选中的流核对分辨率、完整帧数、时长和 1 倍速计数；本次账号具备大会员权益。“1080P 60帧”档会降到 60fps，没有额外的 120 帧按钮。只看标题或 4K 标签不能证明帧率。
+
+抖音建议以官方支持的 60fps 为导出目标并预留高清转码时间，但**本仓库尚未验证成功的 4K60 分发路径**：
+
+```powershell
+.\smoothup.exe .\native4k30.mp4 --platform douyin --fps 60 --engine rife --quality high --report .\douyin4k60.json
+```
+
+对照 N 实际使用的是已验证的 120fps 成品经下列命令派生，不能把它描述为另一次独立的 SmoothUp 30→60fps 转换：
+
+```powershell
+ffmpeg -i .\output.4k120.mp4 -vf fps=60 -c:v libx264 -preset fast -crf 17 -pix_fmt yuv420p -g 120 -c:a copy -movflags +faststart .\output.4k60.mp4
+```
+
+#### 封装方法与证据留档
+
+本轮另查验了 [tk-optimize](https://github.com/motebaya/tk-optimize/blob/51c78b4ca4b9c3ae6739879566ad22170c5d9886/tk_optimize/transformer.py)、[120fps-method](https://github.com/ut0ku/120fps-method/blob/65db9786d02bb7c9838042c9feab947d9465a519/mainwindow.cpp)、[TikTok-Quality-Toolkit](https://github.com/7-u8/TikTok-Quality-Toolkit/blob/65744b118833405195e4cd7380c9702c700ef37f/toolkit/fps_patch.py)、[QualityPatch](https://github.com/Zxnfy/QualityPatch/blob/76eebe63a640743cd3d0f4d732141a403b802a4b/qualitypatch_gui.py) 与 [fps-method](https://github.com/MisticGG/fps-method/blob/a4068e501da4ad9926bb76a872f22917e43b0d7a/MainWindow.axaml.cs) 的实现。这些 TikTok 方法不构成抖音有效证据：涉及未同步的 MP4 时钟、虚构样本表、修改 AAC 或可疑 edit-list 字段写入。H/I/J 本地候选出现解码帧丢失或实际时长变化，未作为合格成品上传；另一个保留 MP4 时序、仅修改 H.264 VUI 的 1080p120 对照 K 私密发布后仍为 720p30。审计提出的 filler 样本表扩展仅是假设，**未实现或发布**；没有合入产品，也没有作为本轮成功方法。
+
+以下原始媒体与脱敏记录保留在忽略目录 `.work/probe/`，不随源码或发布包分发，不含 Cookie、访问令牌或带签名 CDN URL：
+
+- `published-4k120-rife-20261118.json`：本轮成品、正式流、浏览器计数和限制；SHA256 `a1722cb6e0003e36e4900600e6cc3332a5500b356158bbc7c27b77b147d012a9`。
+- `smoothup-4k120-rife.json`：转换报告；SHA256 `9183030dc138c11c6d98909cac525bfc36c8b642c26e6279f602ee8bcc045e6d`。
+- `native4k120-baseline-20261118.json`：原生对照；SHA256 `15eacf3488aec702c6fcbc2c713aa0aee9d02e205680b34d95e432d0bf143aec`。
+- `douyin-official-quality-20261118.json`：官方页面文字，另有同名 PNG；SHA256 `473985177a09757ebe29854d75dd486629b211d6843295dbf639afcdc9996c78`。
+- `4k120-method-audit.json`：上游方法审计与未执行假设；SHA256 `ca6e966955328f707dae6e6735af536369188cfa24cf5b97ac95fab27b208eaa`。
+- `bilibili-M-rife4k120-formal.png`：正式播放页，仅作画面证据；SHA256 `b74e579ca14633a01bc781020ac1201552c63bd2c0c779e3973101701169bca1`。
 
 ## 9. 判定清单
 
